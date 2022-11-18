@@ -3,9 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import HomePage from './pages/Home';
 
-export interface IAppProps {}
-
-const App: React.FunctionComponent<IAppProps> = (props) => {
+const App = () => {
   return (
     <div className="App">
       <BrowserRouter>

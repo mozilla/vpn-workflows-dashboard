@@ -23,9 +23,10 @@ const HomePage = () => {
     }, [])
     
     const getData = async () => {
+        console.log('herererer');
         const workflowData = await getFullTestWorkflowReport()
         // console.log(workflowData);
-        console.log(workflowData.workflow_runs_data[0]);
+        // console.log(workflowData.workflow_runs_data[0]);
         // setWorkflowData(workflowData)
         // console.log(workflowData.workflow_runs_data.map(data => ({ name: data.workflow_run.title, data: data.workflow_run.conclusion })));
         // console.log(workflowData.workflow_runs_data.map(data => ({ name: data.workflow_run.title, data: data.workflow_run.conclusion })));

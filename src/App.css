@@ -1,0 +1,59 @@
+.App {
+  text-align: center;
+}
+
+#main-home {
+  display: flex;
+  justify-content: space-between;
+}
+
+#left {
+  width: 80%;
+  height: 100vh;
+  border: 1px solid red;
+  border-radius: 10px;
+  margin: 5px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+#right {
+  width: 80%;
+  height: 100vh;
+  border: 1px solid blue;
+  border-radius: 10px;
+  margin: 5px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.latest {
+  border: 1px solid green;
+  width: 100%;
+  min-height: 300px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.test-list {
+  border: 1px solid black;
+  border-radius: 10px;
+  margin: 10px 0 0 0;
+  min-height: 500px;
+}
+
+.count {
+  margin-top: 50px;
+}
+
+.run-info {
+  width: 100%;
+  padding: 45px 0 0 0;
+}
+
+.chart {
+  width: 100%;
+}

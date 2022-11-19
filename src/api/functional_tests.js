@@ -1,6 +1,5 @@
 import axios from 'axios'
 import moment from 'moment';
-import data from '../data/data.json'
 
 async function _getSingleWorkflow(workflowId) {
     const singleWorkflowRunApi = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/workflows/${workflowId}/runs?branch=main`    
@@ -122,23 +121,26 @@ async function _getWorkflowCheckRunAnnotation(checkRunId) {
 /// full api
 export async function getFullTestWorkflowReport() {
     let return_data = {        
-        fetched: moment().format(),        
+        fetched: moment().format().valueOf(),        
         workflow_runs_data: []
     };
 
-    if(!_isOutsideTimeWindow){
+    if(await _getLocalData()){        
+        const localData = await _getDataFromLocal()
         return_data.fetch_message = "Its too early to request again, clear expiretime";
-        return_data.workflow_runs_data = data
+        return_data.workflow_runs_data = localData.workflow_runs_data
         return return_data;
     }
 
-    if(await _checkForUpdate()){        
+    if(await _checkForUpdate()){
+        const localData = await _getDataFromLocal() 
         return_data.fetch_message = "No New Workflows Available";
-        return_data.workflow_runs_data = data
+        return_data.workflow_runs_data = localData.workflow_runs_data
         return return_data;
     }
     
     try {
+        console.log('new updates detected get new data');
         // get latest workflow runs for main branch
         const workflows = await _getSingleWorkflow(5937682)
         // get checks (functional test matrix run) for each workflow run
@@ -158,19 +160,22 @@ export async function getFullTestWorkflowReport() {
                     test_annotations: []
                 }
 
-                if(checkRuns.check_runs[j].annotations > 0){
-                    test.test_run = checkRuns.check_runs[j]
+                test.test_run = checkRuns.check_runs[j]
+                if(test.test_run.annotations > 0){
                     const delayTime = Math.floor(Math.random() * 1000) + 200
                     console.log('line 197 delaytime', delayTime)
                     _delay(delayTime)
                     const annotations = await _getWorkflowCheckRunAnnotation(test.test_run.id)
                     test.test_annotations = annotations.run_annotations
-
-                    workflow.test_runs.push(test) 
+                    workflow.workflow_run.flake_count += annotations.run_annotations.length
                 }
 
+                workflow.test_runs.push(test)
+                if(checkRuns.check_runs[j].conclusion){
+                    workflow.workflow_run.passed_tests += 1
+                }
             }
-
+            
             return_data.workflow_runs_data.push(workflow)
         }        
 
@@ -181,21 +186,31 @@ export async function getFullTestWorkflowReport() {
     }
 
     // save to json file
-    const expireTime = moment().add(30, 'm').valueOf()
-    window.localStorage.setItem('expireTime', expireTime)
+    
+    // const oldArray = window.localStorage.getItem('workflows')
+    // if(oldArray){
+
+    // }
+    // const newArray = return_data.workflow_runs_data
+    // let new_return_data = await _appendDataJson(return_data.workflow_runs_data)
+    
+    window.localStorage.setItem('expireTime', moment().add(45, 'm').valueOf())
     window.localStorage.setItem('workflows', JSON.stringify(return_data))
-    const new_return_data = await _appendDataJson(return_data.workflow_runs_data)
-    return new_return_data;
+    return return_data;
 }
 
-async function _isOutsideTimeWindow() {
+async function _getLocalData() {
     // fetch data only within 45 min intervals for same machine
     const existingExpireTime = window.localStorage.getItem('expireTime')
     const fortyFiveMinsAgo = moment().subtract(45, 'minutes').valueOf()        
 
-    if(existingExpireTime && existingExpireTime < fortyFiveMinsAgo){
+    if(existingExpireTime && existingExpireTime > fortyFiveMinsAgo){
+        console.log('is outside of expire time, make new request');
         return true
     }
+
+    console.log('not outside of expiry');
+    return false
 }
 
 async function _checkForUpdate() {
@@ -205,7 +220,7 @@ async function _checkForUpdate() {
         return false
     }
 
-    const origData = JSON.parse(rawOrigData)
+    const origData = JSON.parse(rawOrigData)    
     const apiData = await _getSingleWorkflow(5937682)
 
     const firstOrigData = origData.workflow_runs_data[0].workflow_run.id
@@ -214,24 +229,14 @@ async function _checkForUpdate() {
     return firstApiData === firstOrigData
 }
 
-async function _appendDataJson(newData) {
-    let parsedOrigData;
-
-    // read from file
+async function _getDataFromLocal() {
     const rawOrigData = window.localStorage.getItem('workflows')
 
-    if(rawOrigData){    
-        parsedOrigData = JSON.parse(rawOrigData)
-        parsedOrigData.fetched = Date.now()
-        parsedOrigData.workflow_runs_data.unshift(newData)
-
-        // write back to file
-        const stringModData = JSON.stringify(parsedOrigData);
-        window.localStorage.setItem('workflows', stringModData)        
+    if(!rawOrigData){
+        return false
     }
 
-
-    return parsedOrigData
+    return JSON.parse(rawOrigData)    
 }
 
 const _delay = ms => new Promise(res => setTimeout(res, ms));

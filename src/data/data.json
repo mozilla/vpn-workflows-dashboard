@@ -1,35 +1,6 @@
 {
     "fetched": 1668751394315,
-    "workflow_runs_data": [
-        {
-            "workflow_run": {
-                "id": 3490895564,
-                "workflow_id": 5937682,
-                "check_suite_id": 9367518111,
-                "name": "Functional tests - Appeedddingggin",
-                "started": "2022-11-17T18:17:32Z",
-                "title": "Fix RTL search bar & bold labels (#4953)",
-                "status": "completed",
-                "conclusion": "success",
-                "branch": "main",
-                "actor_email": "lesley@mozilla.com",
-                "actor_name": "Lesley Norton",
-                "actor_message": "Fix RTL search bar & bold labels (#4953)",
-                "actor_commit_time": "2022-11-17T18:17:29Z",
-                "event": "push",
-                "node_id": "WFR_kwLOESXjEs7QEtbM",
-                "url": "https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/runs/3490895564",
-                "html_url": "https://github.com/mozilla-mobile/mozilla-vpn-client/actions/runs/3490895564",
-                "created": "2022-11-17T18:17:32Z",
-                "updated": "2022-11-17T18:56:10Z",
-                "run_attempt": 1,
-                "triggering_actor": "lesleyjanenorton",
-                "jobs_url": "https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/runs/3490895564/jobs",
-                "logs_url": "https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/runs/3490895564/logs",
-                "workflow_url": "https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/workflows/5937682"
-            },
-            "test_runs": []
-        },
+    "workflow_runs": [        
         {
             "workflow_run": {
                 "id": 3490895564,

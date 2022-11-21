@@ -10,7 +10,6 @@
 #left {
   width: 80%;
   height: 100vh;
-  border: 1px solid red;
   border-radius: 10px;
   margin: 5px;
   padding: 15px;
@@ -21,7 +20,6 @@
 #right {
   width: 80%;
   height: 100vh;
-  border: 1px solid blue;
   border-radius: 10px;
   margin: 5px;
   padding: 15px;
@@ -36,17 +34,21 @@
   border-radius: 10px;
   display: flex;
   justify-content: space-around;
+  flex-direction: column;
 }
 
 .test-list {
   border: 1px solid black;
   border-radius: 10px;
   margin: 10px 0 0 0;
-  min-height: 500px;
+  min-height: 600px;
+  overflow: scroll;
+  overflow-x: hidden;
 }
 
 .count {
   margin-top: 50px;
+  margin-bottom: 25px;
 }
 
 .run-info {
@@ -56,4 +58,57 @@
 
 .chart {
   width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.trends {
+  border: 1px solid gray;
+  width: 100%;
+  min-height: 400px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+}
+
+.details {
+  border: 1px solid black;
+  border-radius: 10px;
+  margin: 10px 0 0 0;
+  min-height: 530px;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+.history-row {
+  display: flex;
+  border: 1px solid;
+  margin: 20px;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.history-row .title {
+  font-weight: bold;
+}
+
+.test-history {
+  display: flex;
+  flex-direction: column;
+}
+
+.test-run-history {
+  display: flex;
+}
+
+.subTitle {
+  font-size: 15px;
+}
+
+.sub {
+  font-size: 12px;
+  font-weight: bold;
+  color: gray;
 }

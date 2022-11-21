@@ -4,7 +4,7 @@
 
 import React, { useEffect, useState } from "react";
 import moment from "moment";
-import { getFullTestWorkflowReport } from "../api/functional_tests";
+import { getFullTestWorkflowReport } from "../api/githubService";
 import HomeComponent from "../components/HomeComponent";
 
 const HomePage = () => {

@@ -11,39 +11,40 @@ async function _getSingleWorkflow(workflowId) {
 
   try {
     const { data } = await axios.get(singleWorkflowRunApi);
-    for (let i = 0; i < 12; i++) {
-      const workflow = data.workflow_runs[i];
-      if (workflow.conclusion !== "cancelled") {
-        const workflow_run = {
-          id: workflow.id,
-          workflow_id: workflow.workflow_id,
-          check_suite_id: workflow.check_suite_id,
-          name: workflow.name,
-          started: workflow.run_started_at,
-          title: workflow.display_title,
-          status: workflow.status,
-          conclusion: workflow.conclusion,
-          branch: workflow.head_branch,
-          actor_email: workflow.head_commit.author.email,
-          actor_name: workflow.head_commit.author.name,
-          actor_message: workflow.head_commit.message,
-          actor_commit_time: workflow.head_commit.timestamp,
-          sha: workflow.sha,
-          event: workflow.event,
-          node_id: workflow.node_id,
-          url: workflow.url,
-          html_url: workflow.html_url,
-          created: workflow.created_at,
-          updated: workflow.updated_at,
-          run_attempt: workflow.run_attempt,
-          referenced_wf: workflow.referenced_workflows[0],
-          triggering_actor: workflow.triggering_actor.login,
-          jobs_url: workflow.jobs_url,
-          logs_url: workflow.logs_url,
-          workflow_url: workflow.workflow_url,
-        };
-
-        return_data.push(workflow_run);
+    while (return_data.length < 12) {
+      for(let workflow of data.workflow_runs){
+          if (workflow.conclusion !== "cancelled") {
+            const workflow_run = {
+              id: workflow.id,
+              workflow_id: workflow.workflow_id,
+              check_suite_id: workflow.check_suite_id,
+              name: workflow.name,
+              started: workflow.run_started_at,
+              title: workflow.display_title,
+              status: workflow.status,
+              conclusion: workflow.conclusion,
+              branch: workflow.head_branch,
+              email: workflow.head_commit.author.email,
+              author: workflow.head_commit.author.name,
+              message: workflow.head_commit.message,
+              timestamp: workflow.head_commit.timestamp,
+              sha: workflow.sha,
+              event: workflow.event,
+              node_id: workflow.node_id,
+              url: workflow.url,
+              html_url: workflow.html_url,
+              created: workflow.created_at,
+              updated: workflow.updated_at,
+              run_attempt: workflow.run_attempt,
+              referenced_wf: workflow.referenced_workflows[0],
+              triggering_actor: workflow.triggering_actor.login,
+              jobs_url: workflow.jobs_url,
+              logs_url: workflow.logs_url,
+              workflow_url: workflow.workflow_url,
+            };
+    
+            return_data.push(workflow_run);
+          }
       }
     }
   } catch (err) {
@@ -60,8 +61,7 @@ async function _getWorkflowCheckRuns(checkSuiteId) {
 
   try {
     const { data } = await axios.get(workflowCheckRunsApi);
-    for (let i = 0; i < data.check_runs.length; i++) {
-      const check_run = data.check_runs[i];
+    for (let check_run of data) {
       if (check_run.name !== "Build Test Client") {
         const run = {
           id: check_run.id,
@@ -91,8 +91,7 @@ async function _getWorkflowCheckRunAnnotation(checkRunId) {
 
   try {
     const { data } = await axios.get(workflowCheckRunAnnotationApi);
-    for (let i = 0; i < data.length; i++) {
-      const run_annotation = data[i];
+    for (let run_annotation of data) {
       const annotation = {
         message: run_annotation.message,
         annotation_level: run_annotation.annotation_level,
@@ -126,7 +125,6 @@ export const getFullTestWorkflowReport = async () => {
   }
 
   if (await _checkForUpdate()) {
-    console.log("line 139");
     const localData = await _getDataFromLocal();
     return_data.fetch_message = "No New Workflows Available";
     return_data.workflow_runs_data = localData.workflow_runs_data;
@@ -135,7 +133,8 @@ export const getFullTestWorkflowReport = async () => {
 
   try {
     // get latest workflow runs for main branch
-    const workflows = await _getSingleWorkflow(5937682);
+    const functionalTestsWorkflowId = 5937682;
+    const workflows = await _getSingleWorkflow(functionalTestsWorkflowId);
     // get checks (functional test matrix run) for each workflow run
     for (let i = 0; i < workflows.length; i++) {
       let workflow = {

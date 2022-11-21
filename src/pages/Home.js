@@ -25,7 +25,6 @@ const HomePage = () => {
     setLoading(true);
     getFullTestWorkflowReport()
       .then((workflowData) => {
-        console.log("herererer", workflowData.workflow_runs_data[0]);
         let cData = workflowData.workflow_runs_data.map((data, idx) => ({
           name: `${moment(data.workflow_run.started).format("L")} - ${
             data.workflow_run.title
@@ -53,8 +52,7 @@ const HomePage = () => {
   const buildTestRuns = (workflows) => {
     setLoadingFlakes(true);
     let flakes = [];
-    for (let i = 0; i < workflows.length; i++) {
-      const workflow = workflows[i];
+    for (let workflow of workflows) {
       if (workflow.flaked_count > 0 || workflow.failed_count > 0) {
         const test_runs = workflow.test_runs;
         for (let j = 0; j < test_runs.length; j++) {
@@ -63,7 +61,7 @@ const HomePage = () => {
           if (test_run.test_flake_history.length) {
             const testFlakeHistory = {
               test_commit: workflow.workflow_run.title,
-              test_commit_actor: workflow.workflow_run.actor_name,
+              test_commit_actor: workflow.workflow_run.author,
               test_name: test_run.test_name,
               test_failed_count: 0,
               test_flaked_count: 0,
@@ -71,8 +69,7 @@ const HomePage = () => {
               tests_error_messages: test_run.test_annotations,
             };
 
-            for (let k = 0; k < test_run.test_annotations.length; k++) {
-              const annotation = test_run.test_annotations[k];
+            for (let annotation of test_run.test_annotations) {
               if (annotation.annotation_level === "warning") {
                 testFlakeHistory.test_flaked_count++;
               }
@@ -88,8 +85,8 @@ const HomePage = () => {
       }
     }
 
-    let combinedTests = flakes.reduce(function (acc, curr) {
-      let findIndex = acc.findIndex(function (item) {
+    let combinedTests = flakes.reduce((acc, curr) => {
+      let findIndex = acc.findIndex((item) => {
         return item.test_commit === curr.test_commit;
       });
 

@@ -61,7 +61,7 @@ const HomeComponent = ({
                     )}
                   </div>
                   <div className="sub">
-                    {latestWorkflowData.workflow_run.actor_name}
+                    {latestWorkflowData.workflow_run.author}
                   </div>
                   <div className="count">
                     <div style={{ fontWeight: "bolder", fontSize: 40 }}>

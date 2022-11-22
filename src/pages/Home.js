@@ -90,8 +90,8 @@ const HomePage = () => {
 
   return (
     <div>
-      {isLoading ? (
-        <div>Loading...</div>
+      {!isLoading ? (
+        <div style={{ fontSize: 160, fontWeight: 'bold', marginTop: 300 }}>Loading...</div>
       ) : (
         <HomeComponent
           latestWorkflowData={latestWorkflowData}

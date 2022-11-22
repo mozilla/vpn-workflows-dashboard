@@ -90,7 +90,7 @@ const HomePage = () => {
 
   return (
     <div>
-      {!isLoading ? (
+      {isLoading ? (
         <div style={{ fontSize: 160, fontWeight: 'bold', marginTop: 300 }}>Loading...</div>
       ) : (
         <HomeComponent

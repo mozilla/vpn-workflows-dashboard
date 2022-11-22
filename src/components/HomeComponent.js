@@ -26,21 +26,6 @@ const HomeComponent = ({
   testHistory,
   passPercentage,
 }) => {
-  const getDuration = (run) => {
-    let startTime = moment(run.test_run.started, "HH:mm:ss a"),
-      endTime = moment(run.test_run.completed, "HH:mm:ss a");
-    let duration = moment(endTime).diff(moment(startTime), "minutes");
-    let formattedDuration;
-
-    if (duration < 0) {
-      formattedDuration = duration * -1;
-    } else {
-      formattedDuration = duration;
-    }
-
-    return formattedDuration;
-  };
-
   return (
     <div>
       {latestWorkflowData.workflow_run && (
@@ -53,7 +38,7 @@ const HomeComponent = ({
               <div style={{ display: "flex", flexDirection: "row" }}>
                 <div className="run-info">
                   <div style={{ fontWeight: 600, marginLeft: 20 }}>
-                    {latestWorkflowData.workflow_run.title}
+                    {latestWorkflowData.workflow_run.display_title}
                   </div>
                   <div className="subTitle">
                     {moment(latestWorkflowData.workflow_run.created).format(
@@ -94,7 +79,7 @@ const HomeComponent = ({
                     }}
                     key={run.test_run.id}
                   >
-                    {run.test_run.name} - {getDuration(run)} secs
+                    {run.test_run.name}
                   </div>
                 );
               })}
@@ -125,7 +110,7 @@ const HomeComponent = ({
               <div className="history">
                 {testHistory.map((run) => {
                   return (
-                    <div className="history-row" key={run.test_commit}>
+                    <div className="history-row" key={run.test_id}>
                       <div className="test-name">
                         <div className="title">Test Name</div>
                         <div className="subTitle">{run.test_name}</div>

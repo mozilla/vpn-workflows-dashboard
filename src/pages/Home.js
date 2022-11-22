@@ -27,7 +27,7 @@ const HomePage = () => {
       .then((workflowData) => {
         let cData = workflowData.workflow_runs_data.map((data, idx) => ({
           name: `${moment(data.workflow_run.started).format("L")} - ${
-            data.workflow_run.title
+            data.workflow_run.display_title
           }`,
           passed: data.passed_count,
           flakes: data.flaked_count,
@@ -55,12 +55,11 @@ const HomePage = () => {
     for (let workflow of workflows) {
       if (workflow.flaked_count > 0 || workflow.failed_count > 0) {
         const test_runs = workflow.test_runs;
-        for (let j = 0; j < test_runs.length; j++) {
-          const test_run = test_runs[j];
-
+        for (let test_run of test_runs) {
           if (test_run.test_flake_history.length) {
             const testFlakeHistory = {
-              test_commit: workflow.workflow_run.title,
+              test_id: test_run.test_run.id,
+              test_commit: workflow.workflow_run.display_title,
               test_commit_actor: workflow.workflow_run.author,
               test_name: test_run.test_name,
               test_failed_count: 0,
@@ -83,23 +82,9 @@ const HomePage = () => {
           }
         }
       }
-    }
+    }    
 
-    let combinedTests = flakes.reduce((acc, curr) => {
-      let findIndex = acc.findIndex((item) => {
-        return item.test_commit === curr.test_commit;
-      });
-
-      if (findIndex === -1) {
-        acc.push(curr);
-      } else {
-        acc[findIndex] = Object.assign({}, acc[findIndex], curr);
-      }
-
-      return acc;
-    }, []);
-
-    setTestHistory(combinedTests);
+    setTestHistory(flakes);
     setLoadingFlakes(false);
   };
 

@@ -5,47 +5,54 @@
 import axios from "axios";
 import moment from "moment";
 
-async function _getSingleWorkflow(workflowId) {
+const functionalTestsWorkflowId = 5937682;
+
+const _getSingleWorkflow = async (workflowId) => {
   const singleWorkflowRunApi = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/workflows/${workflowId}/runs?branch=main`;
   let return_data = [];
+  let i = 0;
 
   try {
     const { data } = await axios.get(singleWorkflowRunApi);
     while (return_data.length < 12) {
-      for(let workflow of data.workflow_runs){
-          if (workflow.conclusion !== "cancelled") {
-            const workflow_run = {
-              id: workflow.id,
-              workflow_id: workflow.workflow_id,
-              check_suite_id: workflow.check_suite_id,
-              name: workflow.name,
-              started: workflow.run_started_at,
-              title: workflow.display_title,
-              status: workflow.status,
-              conclusion: workflow.conclusion,
-              branch: workflow.head_branch,
-              email: workflow.head_commit.author.email,
-              author: workflow.head_commit.author.name,
-              message: workflow.head_commit.message,
-              timestamp: workflow.head_commit.timestamp,
-              sha: workflow.sha,
-              event: workflow.event,
-              node_id: workflow.node_id,
-              url: workflow.url,
-              html_url: workflow.html_url,
-              created: workflow.created_at,
-              updated: workflow.updated_at,
-              run_attempt: workflow.run_attempt,
-              referenced_wf: workflow.referenced_workflows[0],
-              triggering_actor: workflow.triggering_actor.login,
-              jobs_url: workflow.jobs_url,
-              logs_url: workflow.logs_url,
-              workflow_url: workflow.workflow_url,
-            };
-    
-            return_data.push(workflow_run);
-          }
+      const workflow = data.workflow_runs[i];
+      if (
+        workflow.conclusion !== "cancelled" &&
+        workflow.status === "completed"
+      ) {
+        const workflow_run = {
+          id: workflow.id,
+          workflow_id: workflow.workflow_id,
+          check_suite_id: workflow.check_suite_id,
+          name: workflow.name,
+          started: workflow.run_started_at,
+          display_title: workflow.display_title,
+          status: workflow.status,
+          conclusion: workflow.conclusion,
+          branch: workflow.head_branch,
+          email: workflow.head_commit.author.email,
+          author: workflow.head_commit.author.name,
+          message: workflow.head_commit.message,
+          timestamp: workflow.head_commit.timestamp,
+          sha: workflow.sha,
+          event: workflow.event,
+          node_id: workflow.node_id,
+          url: workflow.url,
+          html_url: workflow.html_url,
+          created: workflow.created_at,
+          updated: workflow.updated_at,
+          run_attempt: workflow.run_attempt,
+          referenced_wf: workflow.referenced_workflows[0],
+          triggering_actor: workflow.triggering_actor.login,
+          jobs_url: workflow.jobs_url,
+          logs_url: workflow.logs_url,
+          workflow_url: workflow.workflow_url,
+        };
+
+        return_data.push(workflow_run);
       }
+
+      i = i + 1;
     }
   } catch (err) {
     console.log("Unable to fetch getSingleWorkflow", err);
@@ -53,15 +60,17 @@ async function _getSingleWorkflow(workflowId) {
   }
 
   return return_data;
-}
+};
 
-async function _getWorkflowCheckRuns(checkSuiteId) {
+const _getWorkflowCheckRuns = async (checkSuiteId) => {
   const workflowCheckRunsApi = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/check-suites/${checkSuiteId}/check-runs`;
   let return_data = [];
 
   try {
-    const { data } = await axios.get(workflowCheckRunsApi);
-    for (let check_run of data) {
+    const {
+      data: { check_runs },
+    } = await axios.get(workflowCheckRunsApi);
+    for (let check_run of check_runs) {
       if (check_run.name !== "Build Test Client") {
         const run = {
           id: check_run.id,
@@ -83,9 +92,9 @@ async function _getWorkflowCheckRuns(checkSuiteId) {
   }
 
   return return_data;
-}
+};
 
-async function _getWorkflowCheckRunAnnotation(checkRunId) {
+const _getWorkflowCheckRunAnnotation = async (checkRunId) => {
   const workflowCheckRunAnnotationApi = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/check-runs/${checkRunId}/annotations`;
   let return_data = [];
 
@@ -107,7 +116,7 @@ async function _getWorkflowCheckRunAnnotation(checkRunId) {
   }
 
   return return_data;
-}
+};
 
 /// full api
 export const getFullTestWorkflowReport = async () => {
@@ -133,8 +142,8 @@ export const getFullTestWorkflowReport = async () => {
 
   try {
     // get latest workflow runs for main branch
-    const functionalTestsWorkflowId = 5937682;
     const workflows = await _getSingleWorkflow(functionalTestsWorkflowId);
+
     // get checks (functional test matrix run) for each workflow run
     for (let i = 0; i < workflows.length; i++) {
       let workflow = {
@@ -151,6 +160,7 @@ export const getFullTestWorkflowReport = async () => {
       const checkRuns = await _getWorkflowCheckRuns(
         workflow.workflow_run.check_suite_id
       );
+
       for (let j = 0; j < checkRuns.length; j++) {
         let test = {
           test_run: {},
@@ -254,13 +264,18 @@ async function _getDataFromLocal() {
 
 async function _checkForUpdate() {
   const rawOrigData = window.localStorage.getItem("workflows");
+  const expiryTime = window.localStorage.getItem("expireTime");
+
+  if (!expiryTime) {
+    return false;
+  }
 
   if (!rawOrigData) {
     return false;
   }
 
   const origData = JSON.parse(rawOrigData);
-  const apiData = await _getSingleWorkflow(5937682);
+  const apiData = await _getSingleWorkflow(functionalTestsWorkflowId);
 
   const firstOrigData = origData.workflow_runs_data[0].workflow_run.id;
   const firstApiData = apiData.workflow_runs[0].id;

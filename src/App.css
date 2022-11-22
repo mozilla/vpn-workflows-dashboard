@@ -75,6 +75,9 @@
   display: flex;
   justify-content: space-around;
   flex-direction: column;
+  display: flex;
+justify-content: center;
+align-items: center;
 }
 
 .details {

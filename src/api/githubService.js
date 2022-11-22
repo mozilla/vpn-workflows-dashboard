@@ -275,10 +275,10 @@ async function _checkForUpdate() {
   }
 
   const origData = JSON.parse(rawOrigData);
-  const apiData = await _getSingleWorkflow(functionalTestsWorkflowId);
+  const apiData = await _getSingleWorkflow(functionalTestsWorkflowId);  
 
   const firstOrigData = origData.workflow_runs_data[0].workflow_run.id;
-  const firstApiData = apiData.workflow_runs[0].id;
+  const firstApiData = apiData[0].id;
 
   return firstApiData === firstOrigData;
 }

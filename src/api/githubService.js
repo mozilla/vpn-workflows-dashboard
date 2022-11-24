@@ -13,46 +13,19 @@ const _getSingleWorkflow = async (workflowId) => {
   let i = 0;
 
   try {
-    const { data } = await axios.get(singleWorkflowRunApi);
-    while (return_data.length < 12) {
-      const workflow = data.workflow_runs[i];
+    const {
+      data: { workflow_runs },
+    } = await axios.get(singleWorkflowRunApi);
+    while (return_data.length < 20) {
       if (
-        workflow.conclusion !== "cancelled" &&
-        workflow.status === "completed"
+        workflow_runs[i] &&
+        workflow_runs[i].conclusion !== "cancelled" &&
+        workflow_runs[i].status === "completed"
       ) {
-        const workflow_run = {
-          id: workflow.id,
-          workflow_id: workflow.workflow_id,
-          check_suite_id: workflow.check_suite_id,
-          name: workflow.name,
-          started: workflow.run_started_at,
-          display_title: workflow.display_title,
-          status: workflow.status,
-          conclusion: workflow.conclusion,
-          branch: workflow.head_branch,
-          email: workflow.head_commit.author.email,
-          author: workflow.head_commit.author.name,
-          message: workflow.head_commit.message,
-          timestamp: workflow.head_commit.timestamp,
-          sha: workflow.sha,
-          event: workflow.event,
-          node_id: workflow.node_id,
-          url: workflow.url,
-          html_url: workflow.html_url,
-          created: workflow.created_at,
-          updated: workflow.updated_at,
-          run_attempt: workflow.run_attempt,
-          referenced_wf: workflow.referenced_workflows[0],
-          triggering_actor: workflow.triggering_actor.login,
-          jobs_url: workflow.jobs_url,
-          logs_url: workflow.logs_url,
-          workflow_url: workflow.workflow_url,
-        };
-
-        return_data.push(workflow_run);
+        return_data.push(workflow_runs[i]);
       }
 
-      i = i + 1;
+      ++i;
     }
   } catch (err) {
     console.log("Unable to fetch getSingleWorkflow", err);
@@ -72,18 +45,7 @@ const _getWorkflowCheckRuns = async (checkSuiteId) => {
     } = await axios.get(workflowCheckRunsApi);
     for (let check_run of check_runs) {
       if (check_run.name !== "Build Test Client") {
-        const run = {
-          id: check_run.id,
-          name: check_run.name,
-          status: check_run.status,
-          conclusion: check_run.conclusion,
-          head_sha: check_run.head_sha,
-          started: check_run.started_at,
-          completed: check_run.completed_at,
-          annotations: check_run.output.annotations_count,
-        };
-
-        return_data.push(run);
+        return_data.push(check_run);
       }
     }
   } catch (err) {
@@ -101,14 +63,7 @@ const _getWorkflowCheckRunAnnotation = async (checkRunId) => {
   try {
     const { data } = await axios.get(workflowCheckRunAnnotationApi);
     for (let run_annotation of data) {
-      const annotation = {
-        message: run_annotation.message,
-        annotation_level: run_annotation.annotation_level,
-        start_line: run_annotation.start_line,
-        end_line: run_annotation.end_line,
-      };
-
-      return_data.push(annotation);
+      return_data.push(run_annotation);
     }
   } catch (err) {
     console.log("Unable to fetch _getWorkflowCheckRunAnnotation", err);
@@ -125,26 +80,23 @@ export const getFullTestWorkflowReport = async () => {
     workflow_runs_data: [],
   };
 
-  if (await _getLocalData()) {
-    const localData = await _getDataFromLocal();
-    return_data.fetch_message =
-      "Its too early to request again, clear expiretime";
-    return_data.workflow_runs_data = localData.workflow_runs_data;
-    return return_data;
-  }
+  // if (await _getLocalData()) {
+  //   const localData = await _getDataFromLocal();
+  //   return_data.workflow_runs_data = localData.workflow_runs_data;
+  //   return return_data;
+  // }
 
-  if (await _checkForUpdate()) {
-    const localData = await _getDataFromLocal();
-    return_data.fetch_message = "No New Workflows Available";
-    return_data.workflow_runs_data = localData.workflow_runs_data;
-    return return_data;
-  }
+  // if (await _checkForUpdate()) {
+  //   const localData = await _getDataFromLocal();
+  //   return_data.workflow_runs_data = localData.workflow_runs_data;
+  //   return return_data;
+  // }
 
   try {
     // get latest workflow runs for main branch
     const workflows = await _getSingleWorkflow(functionalTestsWorkflowId);
 
-    // get checks (functional test matrix run) for each workflow run
+    // build object for workflow runs and check runs (functional test matrix run) for each workflow run
     for (let i = 0; i < workflows.length; i++) {
       let workflow = {
         workflow_run: {},
@@ -155,13 +107,12 @@ export const getFullTestWorkflowReport = async () => {
       };
 
       workflow.workflow_run = workflows[i];
-      const delayTime = Math.floor(Math.random() * 1000) + 200;
-      _delay(delayTime);
+      _delay(Math.floor(Math.random() * 1000) + 200);
       const checkRuns = await _getWorkflowCheckRuns(
         workflow.workflow_run.check_suite_id
       );
 
-      for (let j = 0; j < checkRuns.length; j++) {
+      for (let checkRun of checkRuns) {
         let test = {
           test_run: {},
           test_annotations: [],
@@ -171,11 +122,11 @@ export const getFullTestWorkflowReport = async () => {
           test_passed_count: 0,
         };
 
-        test.test_run = checkRuns[j];
-        test.test_name = checkRuns[j].name;
-        test.test_started = checkRuns[j].started;
-        test.test_completed = checkRuns[j].completed;
-        if (test.test_run.annotations > 0) {
+        test.test_run = checkRun;
+        test.test_name = checkRun.name;
+        test.test_started = checkRun.started_at;
+        test.test_completed = checkRun.completed_at;
+        if (test.test_run.output.annotations_count > 0) {
           let flake = {
             flakes: 0,
             failures: 0,
@@ -192,23 +143,26 @@ export const getFullTestWorkflowReport = async () => {
             test.test_run.id
           );
           test.test_annotations = annotations;
-          workflow.flaked_count += annotations.length;
           flake.test_name = test.test_run.test_name;
 
-          for (let k = 0; k < annotations.length; k++) {
-            if (annotations[k].annotation_level === "warning") {
+          for (let annotation of annotations) {
+            if (annotation.annotation_level === "warning") {
+              workflow.flaked_count++;
+              test.test_flaked_count++;
               flake.flakes++;
-              message.info = annotations[k].message;
-              message.start_line = annotations[k].start_line;
-              message.end_line = annotations[k].end_line;
+              message.info = annotation.message;
+              message.start_line = annotation.start_line;
+              message.end_line = annotation.end_line;
               flake.messages.push(message);
             }
 
-            if (annotations[k].annotation_level === "failure") {
+            if (annotation.annotation_level === "failure") {
+              workflow.failed_count++;
+              test.test_failed_count++;
               flake.failures++;
-              message.info = annotations[k].message;
-              message.start_line = annotations[k].start_line;
-              message.end_line = annotations[k].end_line;
+              message.info = annotation.message;
+              message.start_line = annotation.start_line;
+              message.end_line = annotation.end_line;
               flake.messages.push(message);
             }
 
@@ -217,12 +171,11 @@ export const getFullTestWorkflowReport = async () => {
         }
 
         workflow.test_runs.push(test);
-        if (checkRuns[j].conclusion === "success") {
+
+        // update test run and workflow run passed counts
+        if (checkRun.conclusion === "success") {
           workflow.passed_count += 1;
           test.test_passed_count += 1;
-        } else {
-          workflow.failed_count += 1;
-          test.test_failed_count += 1;
         }
       }
 
@@ -275,7 +228,7 @@ async function _checkForUpdate() {
   }
 
   const origData = JSON.parse(rawOrigData);
-  const apiData = await _getSingleWorkflow(functionalTestsWorkflowId);  
+  const apiData = await _getSingleWorkflow(functionalTestsWorkflowId);
 
   const firstOrigData = origData.workflow_runs_data[0].workflow_run.id;
   const firstApiData = apiData[0].id;

@@ -25,14 +25,14 @@ const HomePage = () => {
     setLoading(true);
     getFullTestWorkflowReport()
       .then((workflowData) => {
-        let cData = workflowData.workflow_runs_data.map((data, idx) => ({
-          name: `${moment(data.workflow_run.started).format("L")} - ${
+        let cData = workflowData.workflow_runs_data.map(data => ({
+          name: `${moment(data.workflow_run.run_started_at).format("L")} - ${
             data.workflow_run.display_title
           }`,
           passed: data.passed_count,
           flakes: data.flaked_count,
           failures: data.failed_count,
-          date: moment(data.workflow_run.started).format("L"),
+          date: moment(data.workflow_run.run_started_at).format("L"),
         }));
 
         const passPerc = Math.floor(
@@ -40,6 +40,7 @@ const HomePage = () => {
             workflowData.workflow_runs_data[0].test_runs.length) *
             100
         );
+
         setPassPercentage(passPerc);
         buildTestRuns(workflowData.workflow_runs_data);
         setChartData(cData.reverse());
@@ -53,36 +54,25 @@ const HomePage = () => {
     setLoadingFlakes(true);
     let flakes = [];
     for (let workflow of workflows) {
-      if (workflow.flaked_count > 0 || workflow.failed_count > 0) {
-        const test_runs = workflow.test_runs;
-        for (let test_run of test_runs) {
+      if (workflow.flaked_count > 0 || workflow.failed_count > 0) {        
+        for (let test_run of workflow.test_runs) {
           if (test_run.test_flake_history.length) {
             const testFlakeHistory = {
               test_id: test_run.test_run.id,
               test_commit: workflow.workflow_run.display_title,
               test_commit_actor: workflow.workflow_run.author,
               test_name: test_run.test_name,
-              test_failed_count: 0,
-              test_flaked_count: 0,
+              test_failed_count: test_run.test_failed_count,
+              test_flaked_count: test_run.test_flaked_count,
               test_date: test_run.test_completed,
               tests_error_messages: test_run.test_annotations,
             };
-
-            for (let annotation of test_run.test_annotations) {
-              if (annotation.annotation_level === "warning") {
-                testFlakeHistory.test_flaked_count++;
-              }
-
-              if (annotation.annotation_level === "failure") {
-                testFlakeHistory.test_failed_count++;
-              }
-            }
 
             flakes.push(testFlakeHistory);
           }
         }
       }
-    }    
+    }
 
     setTestHistory(flakes);
     setLoadingFlakes(false);

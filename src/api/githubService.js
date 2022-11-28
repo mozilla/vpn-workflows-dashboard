@@ -10,9 +10,6 @@ const functionalTestsWorkflowId = 5937682;
 export const getAllWorkflows = async () => {
   const api = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/runs?branch=main`;
 
-  let wfRunsInfo = [];
-  let workflows = {};
-
   if (await _isWithinExpiryTime("awf_expireTime"))
     return await _getDataFromLocal("all_workflows");
 
@@ -20,8 +17,11 @@ export const getAllWorkflows = async () => {
     data: { workflow_runs },
   } = await axios.get(api);
 
+  let wfRunsInfo = [];
+  let workflows = {};
+
   for (let workflow_run of workflow_runs) {
-    if (workflows[workflow_run.name] === undefined) {
+    if (!(workflow_run.name in workflows)) {
       workflows[workflow_run.name] = workflow_run.id;
       wfRunsInfo.push(workflow_run);
     }
@@ -84,7 +84,6 @@ export const getFullTestWorkflowReport = async () => {
       };
 
       workflow.workflow_run = workflows[i];
-      _delay(Math.floor(Math.random() * 1000) + 200);
       const checkRuns = await _getWorkflowCheckRuns(
         workflow.workflow_run.check_suite_id
       );
@@ -114,8 +113,6 @@ export const getFullTestWorkflowReport = async () => {
 
           let message = {};
 
-          const delayTime = Math.floor(Math.random() * 1000) + 200;
-          _delay(delayTime);
           const annotations = await _getWorkflowCheckRunAnnotation(
             test.test_run.id
           );
@@ -177,7 +174,7 @@ const _getSingleWorkflow = async (workflowId) => {
     const {
       data: { workflow_runs },
     } = await axios.get(singleWorkflowRunApi);
-    while (return_data.length < 12) {
+    while (return_data.length < 12 && workflow_runs.length) {
       if (
         workflow_runs[i] &&
         workflow_runs[i].conclusion !== "cancelled" &&

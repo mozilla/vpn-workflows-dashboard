@@ -4,14 +4,8 @@
 
 import React from "react";
 import moment from "moment";
-import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
+import { LineGraph } from "./TestHistoryLineGraph";
+import { DonutGraph } from "./ResultPieGraph";
 
 const statuses = {
   success: "#17ca80",
@@ -26,6 +20,21 @@ const HomeComponent = ({
   testHistory,
   passPercentage,
 }) => {
+  const calculateDuration = ({ start, end }) => {
+    const startTime = moment(start, "HH:mm:ss a");
+    const endTime = moment(end, "HH:mm:ss a");
+    const min = moment.utc(endTime.diff(startTime)).format("mm");
+    const sec = moment.utc(endTime.diff(startTime)).format("ss");
+    return `${Number(min)}m ${sec}s`;
+  };
+
+  const generatePrUrl = (run) => {
+    const pr_title = run.display_title;
+    const getHashIndex = pr_title.lastIndexOf("#");
+    const pullRequestNumber = pr_title.slice(getHashIndex + 1).replace(")", "");
+    return `https://github.com/mozilla-mobile/mozilla-vpn-client/pull/${pullRequestNumber}`;
+  };
+
   return (
     <div>
       {latestWorkflowData.workflow_run && (
@@ -37,7 +46,18 @@ const HomeComponent = ({
               </div>
               <div style={{ display: "flex", flexDirection: "row" }}>
                 <div className="run-info">
-                  <div style={{ fontWeight: 600, marginLeft: 20 }}>
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      marginLeft: 20,
+                      cursor: "pointer",
+                    }}
+                    onClick={() =>
+                      window.open(
+                        generatePrUrl(latestWorkflowData.workflow_run)
+                      )
+                    }
+                  >
                     {latestWorkflowData.workflow_run.display_title}
                   </div>
                   <div className="subTitle">
@@ -46,20 +66,29 @@ const HomeComponent = ({
                     )}
                   </div>
                   <div className="sub">
-                    {latestWorkflowData.workflow_run.author}
+                    {latestWorkflowData.workflow_run.head_commit.author.name}
                   </div>
                   <div className="count">
                     <div style={{ fontWeight: "bolder", fontSize: 40 }}>
                       {latestWorkflowData.test_runs.length}
                     </div>
-                    <div>test cases</div>
+                    <div>Test Cases</div>
+                    <div
+                      style={{ fontSize: 12, fontWeight: 600, color: "gray" }}
+                    >
+                      Total Duration:{" "}
+                      {calculateDuration({
+                        start: latestWorkflowData.workflow_run.run_started_at,
+                        end: latestWorkflowData.workflow_run.updated_at,
+                      })}
+                    </div>
                   </div>
                 </div>
                 <div className="chart">
-                  <div style={{ fontSize: 60, fontWeight: "bold" }}>
-                    {passPercentage}%
-                  </div>
-                  <div>Passed test cases</div>
+                  <DonutGraph
+                    latestWorkflowData={latestWorkflowData}
+                    passPercentage={passPercentage}
+                  />
                 </div>
               </div>
             </div>
@@ -71,46 +100,42 @@ const HomeComponent = ({
                 return (
                   <div
                     style={{
-                      margin: "2px 0",
-                      padding: "5px",
+                      margin: "5px 0",
+                      padding: "15px",
                       cursor: "pointer",
-                      borderBottom: "1px solid",
+                      width: 800,
+                      borderRadius: 5,
                       backgroundColor: `${statuses[run.test_run.conclusion]}`,
                     }}
+                    onClick={() => window.open(run.test_run.html_url)}
                     key={run.test_run.id}
                   >
-                    {run.test_run.name}
+                    {run.test_run.name} -{" "}
+                    {calculateDuration({
+                      start: run.test_run.started_at,
+                      end: run.test_run.completed_at,
+                    })}
                   </div>
                 );
               })}
             </div>
           </div>
           <div id="right">
-            <div className="trends">
-              <h3>Test Trends</h3>
-              <LineChart
-                isAnimationActive={true}
-                width={800}
-                height={300}
-                data={chartData}
-              >
-                <Line type="monotone" dataKey="passed" stroke="#228B22" />
-                <Line type="monotone" dataKey="flakes" stroke="#FFDB58" />
-                <Line type="monotone" dataKey="failures" stroke="#FF0000" />
-                <CartesianGrid stroke="#ccc" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-              </LineChart>
+            <div className="trends" style={{ width: "100%", height: 300 }}>
+              <LineGraph chartData={chartData} />
             </div>
             <div className="details">
               <div>
-                <h3>Flake History (Past 10 commits)</h3>
+                <h3>Flake History</h3>
               </div>
               <div className="history">
-                {testHistory.map((run) => {
+                {testHistory.map((run, idx) => {
                   return (
-                    <div className="history-row" key={run.test_id}>
+                    <div
+                      className="history-row"
+                      key={idx}
+                      onClick={() => window.open(run.test_html_url)}
+                    >
                       <div className="test-name">
                         <div className="title">Test Name</div>
                         <div className="subTitle">{run.test_name}</div>
@@ -121,17 +146,21 @@ const HomeComponent = ({
                       <div className="commit">
                         <div className="title">Commit</div>
                         <div className="subTitle">{run.test_commit}</div>
-                        <div className="sub">{run.test_commit_actor}</div>
+                        <div className="sub">By {run.test_commit_actor}</div>
                       </div>
                       <div className="test-history">
                         <div className="title">History</div>
                         <div className="test-run-history">
                           <div>
-                            <div className="sub">Flaky Run(s)</div>
+                            <div className="sub" style={{ color: "#ffbf00" }}>
+                              Flake(s)
+                            </div>
                             <div>{run.test_flaked_count}</div>
                           </div>
                           <div>
-                            <div className="sub">Failed Run(s)</div>
+                            <div className="sub" style={{ color: "#f47169" }}>
+                              Failure(s)
+                            </div>
                             <div>{run.test_failed_count}</div>
                           </div>
                         </div>

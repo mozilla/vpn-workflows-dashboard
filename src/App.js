@@ -5,7 +5,9 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import HomePage from './pages/Home';
+import HomePage from './pages/HomePage';
+import FunctionalTestsPage from './pages/FunctionalTestsPage';
+import WorkflowHistoryPage from './pages/WorkflowHistoryPage';
 
 const App = () => {
   return (
@@ -13,6 +15,8 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<HomePage />} />
+          <Route path='/workflows/:workflowId' element={<WorkflowHistoryPage />} />
+          <Route path='/functional-tests' element={<FunctionalTestsPage />} />
         </Routes>
       </BrowserRouter>
     </div>

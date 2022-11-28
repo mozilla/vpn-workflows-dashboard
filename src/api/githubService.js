@@ -7,90 +7,67 @@ import moment from "moment";
 
 const functionalTestsWorkflowId = 5937682;
 
-const _getSingleWorkflow = async (workflowId) => {
-  const singleWorkflowRunApi = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/workflows/${workflowId}/runs?branch=main`;
-  let return_data = [];
-  let i = 0;
+export const getAllWorkflows = async () => {
+  const api = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/runs?branch=main`;
 
-  try {
-    const {
-      data: { workflow_runs },
-    } = await axios.get(singleWorkflowRunApi);
-    while (return_data.length < 20) {
-      if (
-        workflow_runs[i] &&
-        workflow_runs[i].conclusion !== "cancelled" &&
-        workflow_runs[i].status === "completed"
-      ) {
-        return_data.push(workflow_runs[i]);
-      }
+  let wfRunsInfo = [];
+  let workflows = {};
 
-      ++i;
+  if (await _isWithinExpiryTime("awf_expireTime"))
+    return await _getDataFromLocal("all_workflows");
+
+  const {
+    data: { workflow_runs },
+  } = await axios.get(api);
+
+  for (let workflow_run of workflow_runs) {
+    if (workflows[workflow_run.name] === undefined) {
+      workflows[workflow_run.name] = workflow_run.id;
+      wfRunsInfo.push(workflow_run);
     }
-  } catch (err) {
-    console.log("Unable to fetch getSingleWorkflow", err);
-    return;
   }
 
-  return return_data;
+  window.localStorage.setItem(
+    "awf_expireTime",
+    moment().add(45, "m").valueOf()
+  );
+  window.localStorage.setItem("all_workflows", JSON.stringify(wfRunsInfo));
+  return wfRunsInfo;
 };
 
-const _getWorkflowCheckRuns = async (checkSuiteId) => {
-  const workflowCheckRunsApi = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/check-suites/${checkSuiteId}/check-runs`;
-  let return_data = [];
+export const getAllRunsForWorkflow = async (workflow_id) => {
+  const api = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/workflows/${workflow_id}/runs?branch=main&per_page=100`;
 
-  try {
-    const {
-      data: { check_runs },
-    } = await axios.get(workflowCheckRunsApi);
-    for (let check_run of check_runs) {
-      if (check_run.name !== "Build Test Client") {
-        return_data.push(check_run);
-      }
-    }
-  } catch (err) {
-    console.log("Unable to fetch _getWorkflowCheckRuns", err);
-    return;
-  }
+  if (await _isWithinExpiryTime(`awfs_expireTime_${workflow_id}`))
+    return await _getDataFromLocal(`awfs_workflows_${workflow_id}`);
 
-  return return_data;
+  const {
+    data: { workflow_runs },
+  } = await axios.get(api);
+
+  window.localStorage.setItem(
+    `awfs_expireTime_${workflow_id}`,
+    moment().add(45, "m").valueOf()
+  );
+  window.localStorage.setItem(
+    `awfs_workflows_${workflow_id}`,
+    JSON.stringify(workflow_runs)
+  );
+  return workflow_runs;
 };
 
-const _getWorkflowCheckRunAnnotation = async (checkRunId) => {
-  const workflowCheckRunAnnotationApi = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/check-runs/${checkRunId}/annotations`;
-  let return_data = [];
-
-  try {
-    const { data } = await axios.get(workflowCheckRunAnnotationApi);
-    for (let run_annotation of data) {
-      return_data.push(run_annotation);
-    }
-  } catch (err) {
-    console.log("Unable to fetch _getWorkflowCheckRunAnnotation", err);
-    return;
-  }
-
-  return return_data;
-};
-
-/// full api
 export const getFullTestWorkflowReport = async () => {
   let return_data = {
     fetched: moment().format().valueOf(),
     workflow_runs_data: [],
   };
 
-  // if (await _getLocalData()) {
-  //   const localData = await _getDataFromLocal();
-  //   return_data.workflow_runs_data = localData.workflow_runs_data;
-  //   return return_data;
-  // }
+  if (await _isWithinExpiryTime("expireTime"))
+    return await _getDataFromLocal("workflows");
 
-  // if (await _checkForUpdate()) {
-  //   const localData = await _getDataFromLocal();
-  //   return_data.workflow_runs_data = localData.workflow_runs_data;
-  //   return return_data;
-  // }
+  const apiData = await _getSingleWorkflow(functionalTestsWorkflowId);
+  if (await _checkForUpdate("expireTime", "workflows", apiData))
+    return await _getDataFromLocal("workflows");
 
   try {
     // get latest workflow runs for main branch
@@ -191,22 +168,90 @@ export const getFullTestWorkflowReport = async () => {
   return return_data;
 };
 
-async function _getLocalData() {
+const _getSingleWorkflow = async (workflowId) => {
+  const singleWorkflowRunApi = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/actions/workflows/${workflowId}/runs?branch=main`;
+  let return_data = [];
+  let i = 0;
+
+  try {
+    const {
+      data: { workflow_runs },
+    } = await axios.get(singleWorkflowRunApi);
+    while (return_data.length < 12) {
+      if (
+        workflow_runs[i] &&
+        workflow_runs[i].conclusion !== "cancelled" &&
+        workflow_runs[i].status === "completed"
+      ) {
+        return_data.push(workflow_runs[i]);
+      }
+
+      ++i;
+    }
+  } catch (err) {
+    console.log("Unable to fetch getSingleWorkflow", err);
+    return;
+  }
+
+  return return_data;
+};
+
+const _getWorkflowCheckRuns = async (checkSuiteId) => {
+  const workflowCheckRunsApi = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/check-suites/${checkSuiteId}/check-runs`;
+  let return_data = [];
+
+  try {
+    const {
+      data: { check_runs },
+    } = await axios.get(workflowCheckRunsApi);
+    for (let check_run of check_runs) {
+      if (check_run.name !== "Build Test Client") {
+        return_data.push(check_run);
+      }
+    }
+  } catch (err) {
+    console.log("Unable to fetch _getWorkflowCheckRuns", err);
+    return;
+  }
+
+  return return_data;
+};
+
+const _getWorkflowCheckRunAnnotation = async (checkRunId) => {
+  const workflowCheckRunAnnotationApi = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/check-runs/${checkRunId}/annotations`;
+  let return_data = [];
+
+  try {
+    const { data } = await axios.get(workflowCheckRunAnnotationApi);
+    for (let run_annotation of data) {
+      return_data.push(run_annotation);
+    }
+  } catch (err) {
+    console.log("Unable to fetch _getWorkflowCheckRunAnnotation", err);
+    return;
+  }
+
+  return return_data;
+};
+
+async function _isWithinExpiryTime(expireTime) {
   // fetch data only within 45 min intervals for same machine
-  const existingExpireTime = window.localStorage.getItem("expireTime");
+  const existingExpireTime = window.localStorage.getItem(expireTime);
   const fortyFiveMinsAgo = moment().subtract(45, "minutes").valueOf();
 
   if (!existingExpireTime) {
     return false;
-  } else if (existingExpireTime && existingExpireTime > fortyFiveMinsAgo) {
-    return true;
-  } else {
-    return false;
   }
+
+  if (existingExpireTime && existingExpireTime > fortyFiveMinsAgo) {
+    return true;
+  }
+
+  return false;
 }
 
-async function _getDataFromLocal() {
-  const rawOrigData = window.localStorage.getItem("workflows");
+async function _getDataFromLocal(dataName) {
+  const rawOrigData = window.localStorage.getItem(dataName);
 
   if (!rawOrigData) {
     return false;
@@ -215,9 +260,9 @@ async function _getDataFromLocal() {
   return JSON.parse(rawOrigData);
 }
 
-async function _checkForUpdate() {
-  const rawOrigData = window.localStorage.getItem("workflows");
-  const expiryTime = window.localStorage.getItem("expireTime");
+async function _checkForUpdate(expireTime, dataName, apiData) {
+  const rawOrigData = window.localStorage.getItem(dataName);
+  const expiryTime = window.localStorage.getItem(expireTime);
 
   if (!expiryTime) {
     return false;
@@ -228,12 +273,12 @@ async function _checkForUpdate() {
   }
 
   const origData = JSON.parse(rawOrigData);
-  const apiData = await _getSingleWorkflow(functionalTestsWorkflowId);
 
-  const firstOrigData = origData.workflow_runs_data[0].workflow_run.id;
-  const firstApiData = apiData[0].id;
+  const firstOrigData = origData[0].run_started_at;
+  const firstApiData = apiData[0].run_started_at;
 
   return firstApiData === firstOrigData;
 }
 
+// randomizing time between requests. rate limiting precautions,
 const _delay = (ms) => new Promise((res) => setTimeout(res, ms));

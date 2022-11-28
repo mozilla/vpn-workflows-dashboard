@@ -6,6 +6,31 @@
   text-align: center;
 }
 
+.loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 120px;
+  height: 120px;
+  margin: -76px 0 0 -76px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #17ca80;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 #main-home {
   display: flex;
   justify-content: space-between;
@@ -32,22 +57,24 @@
 }
 
 .latest {
-  border: 1px solid green;
   width: 100%;
   min-height: 300px;
   border-radius: 10px;
   display: flex;
   justify-content: space-around;
   flex-direction: column;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.35);
 }
 
 .test-list {
-  border: 1px solid black;
   border-radius: 10px;
   margin: 10px 0 0 0;
   min-height: 600px;
   overflow: scroll;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .count {
@@ -57,7 +84,7 @@
 
 .run-info {
   width: 100%;
-  padding: 45px 0 0 0;
+  padding: 20px 0 0 0;
 }
 
 .chart {
@@ -65,10 +92,11 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
+  height: 220px;
+  align-items: center;
 }
 
 .trends {
-  border: 1px solid gray;
   width: 100%;
   min-height: 400px;
   border-radius: 10px;
@@ -76,12 +104,13 @@
   justify-content: space-around;
   flex-direction: column;
   display: flex;
-justify-content: center;
-align-items: center;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.35);
+  padding: 18px 0;
 }
 
 .details {
-  border: 1px solid black;
   border-radius: 10px;
   margin: 10px 0 0 0;
   min-height: 530px;
@@ -95,6 +124,8 @@ align-items: center;
   margin: 20px;
   border-radius: 10px;
   padding: 20px;
+  justify-content: space-between;
+  cursor: pointer;
 }
 
 .history-row .title {
@@ -107,15 +138,51 @@ align-items: center;
 }
 
 .test-run-history {
+  width: 120px;
   display: flex;
+  justify-content: space-between;  
 }
 
 .subTitle {
-  font-size: 15px;
+  font-size: 13px;
 }
 
 .sub {
   font-size: 12px;
   font-weight: bold;
-  color: gray;
+  color: #B2B2B2;
+}
+
+.commit  {
+  width: 300px;
+}
+
+.test-name {
+  width: 300px;
+}
+
+#workflows-container {
+  max-width: 1200px;
+  margin: 1px auto;
+  display: grid;
+  gap: 4rem;
+}
+
+.wf-history canvas {
+  box-shadow: 0 15px 50px rgba(0,0,0,0.35) !important;
+  border-radius: 10px;
+  padding: 50px;
+}
+
+@media (min-width: 600px){
+  #workflows-container { 
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 1200px;
+  }
+}
+
+@media (min-width: 900px){
+  #workflows-container { 
+      grid-template-columns: repeat(3, 1fr);
+  }
 }

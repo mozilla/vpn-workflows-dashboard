@@ -276,6 +276,3 @@ async function _checkForUpdate(expireTime, dataName, apiData) {
 
   return firstApiData === firstOrigData;
 }
-
-// randomizing time between requests. rate limiting precautions,
-const _delay = (ms) => new Promise((res) => setTimeout(res, ms));

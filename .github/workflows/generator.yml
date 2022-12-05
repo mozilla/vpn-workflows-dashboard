@@ -27,5 +27,7 @@ jobs:
           git config --global user.email "<>"
           git config --global user.name "Github Actions"
           git add .
-          git commit -m "Chore (automated): update workflow details $(date)"
-          git push origin main
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git commit -m "Chore (automated): update workflow details $(date)"
+            git push origin main
+          fi

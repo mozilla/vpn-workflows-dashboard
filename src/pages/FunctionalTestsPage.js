@@ -24,7 +24,7 @@ const FunctionalTestsPage = () => {
     setLoading(true);
     getFullTestWorkflowReport()
       .then((workflowData) => {
-        let cData = workflowData.workflow_runs_data.map((data) => ({
+        let cData = workflowData.map((data) => ({
           name: `${moment(data.workflow_run.run_started_at).format("L")} - ${
             data.workflow_run.display_title
           }`,
@@ -35,15 +35,14 @@ const FunctionalTestsPage = () => {
         }));
 
         const passPerc = Math.floor(
-          (workflowData.workflow_runs_data[0].passed_count /
-            workflowData.workflow_runs_data[0].test_runs.length) *
+          (workflowData[0].passed_count / workflowData[0].test_runs.length) *
             100
         );
 
         setPassPercentage(passPerc);
-        buildTestRuns(workflowData.workflow_runs_data);
+        buildTestRuns(workflowData);
         setChartData(cData.reverse());
-        setLatestWorkflowData(workflowData.workflow_runs_data[0]);
+        setLatestWorkflowData(workflowData[0]);
         setLoading(false);
       })
       .catch((err) => console.log(err));
@@ -56,11 +55,11 @@ const FunctionalTestsPage = () => {
         for (let test_run of workflow.test_runs) {
           if (test_run.test_flake_history.length) {
             const testFlakeHistory = {
-              test_id: test_run.test_run.id,
+              test_id: test_run.test.id,
               test_commit: workflow.workflow_run.display_title,
               test_commit_actor: workflow.workflow_run.head_commit.author.name,
               test_name: test_run.test_name,
-              test_html_url: test_run.test_run.html_url,
+              test_html_url: test_run.test.html_url,
               test_failed_count: test_run.test_failed_count,
               test_flaked_count: test_run.test_flaked_count,
               test_date: test_run.test_completed,

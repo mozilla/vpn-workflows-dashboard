@@ -105,15 +105,15 @@ const HomeComponent = ({
                       cursor: "pointer",
                       width: 800,
                       borderRadius: 5,
-                      backgroundColor: `${statuses[run.test_run.conclusion]}`,
+                      backgroundColor: `${statuses[run.test.conclusion]}`,
                     }}
-                    onClick={() => window.open(run.test_run.html_url)}
-                    key={run.test_run.id}
+                    onClick={() => window.open(run.test.html_url)}
+                    key={run.test.id}
                   >
-                    {run.test_run.name} -{" "}
+                    {run.test.name} -{" "}
                     {calculateDuration({
-                      start: run.test_run.started_at,
-                      end: run.test_run.completed_at,
+                      start: run.test.started_at,
+                      end: run.test.completed_at,
                     })}
                   </div>
                 );

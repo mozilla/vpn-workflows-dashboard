@@ -26,6 +26,7 @@ const WorkflowCard = ({ workflow }) => {
 
   return (
     <div
+    key={workflow.node_id}
       onClick={() => openHistory(workflow)}
       style={{
         cursor: "pointer",

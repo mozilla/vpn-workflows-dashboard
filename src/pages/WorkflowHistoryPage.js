@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React, { useEffect, useState } from "react";
+import moment from "moment";
 import { useParams } from "react-router-dom";
 import { getAllRunsForWorkflow } from "../api/githubService";
 import { WfLineGraph } from "../components/WorkflowHistoryLineGraph";
@@ -11,6 +12,7 @@ const WorkflowHistoryPage = () => {
   const params = useParams();
   const [isLoading, setLoading] = useState(false);
   const [chartData, setChartData] = useState([]);
+  const [failures, setFailures] = useState([]);
 
   useEffect(() => {
     getData();
@@ -22,14 +24,21 @@ const WorkflowHistoryPage = () => {
     setLoading(true);
     let dateHash = {};
     let chartDataArray = [];
+    let failures = [];
     getAllRunsForWorkflow(params.workflowId)
       .then((workflowHistory) => {
         workflowHistory.forEach((wf) => {
-          const date = wf.run_started_at.split("T")[0];
-          if (dateHash[date]) {
-            dateHash[date].push(wf);
-          } else {
-            dateHash[date] = [wf];
+          if (wf?.run_started_at) {
+            const date = wf.run_started_at?.split("T")[0];
+            if (dateHash[date]) {
+              dateHash[date].push(wf);
+            } else {
+              dateHash[date] = [wf];
+            }
+          }
+
+          if (wf.conclusion === "failure" && wf?.run_started_at) {
+            failures.push(wf);
           }
         });
 
@@ -60,6 +69,7 @@ const WorkflowHistoryPage = () => {
           chartDataArray.push(cObject);
         }
 
+        setFailures(failures);
         setChartData(chartDataArray.reverse());
         setLoading(false);
       })
@@ -74,7 +84,48 @@ const WorkflowHistoryPage = () => {
       {isLoading ? (
         <div className="loader"></div>
       ) : (
-        <WfLineGraph chartData={chartData} />
+        <>
+          <WfLineGraph chartData={chartData} />
+          <div className="details" style={{ height: 500 }}>
+            <div>
+              <h3>Failure History</h3>
+            </div>
+            <div
+              className="history"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+              }}
+            >
+              {failures.map((run, idx) => {
+                return (
+                  <div
+                    className="history-row"
+                    style={{ justifyContent: "space-evenly" }}
+                    key={idx}
+                    onClick={() => window.open(run.html_url)}
+                  >
+                    <div className="test-name">
+                      <div className="title">Workflow Run Title</div>
+                      <div className="subTitle">{run.display_title}</div>
+                      <div className="sub">
+                        {moment(run.run_started_at).format("MMM. Do YYYY")}
+                      </div>
+                    </div>
+                    <div className="commit">
+                      <div className="title">Commit</div>
+                      <div className="subTitle">{run.head_commit.message}</div>
+                      <div className="sub">
+                        By {run.head_commit.author.name}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

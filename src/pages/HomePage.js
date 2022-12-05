@@ -40,7 +40,7 @@ const HomePage = () => {
         ) : (
           workflows.map((workflow) => {
             return (
-              <WorkflowCard key={workflow.workflow_id} workflow={workflow} />
+              <WorkflowCard key={workflow.node_id} workflow={workflow} />
             );
           })
         )}

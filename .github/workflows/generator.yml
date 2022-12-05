@@ -1,0 +1,28 @@
+name: Generate VPN Dashboard Data
+on:
+  pull_request:
+    branches:
+      - main      
+
+  workflow_dispatch:
+
+jobs:
+  generate-dashboard-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Nodejs script to gather pipeline status
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'          
+      - run: npm ci
+      - run: node generate_data.js
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: merge updated details to main
+        run: |
+          git config --global user.email "<>"
+          git config --global user.name "Github Actions"
+          git add .
+          git commit -m "Chore (automated): update workflow details $(date)"
+          git push origin main

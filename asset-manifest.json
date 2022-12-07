@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/vpn-functional-tests-dashboard/static/css/main.0d9a1fe8.css",
-    "main.js": "/vpn-functional-tests-dashboard/static/js/main.03f7f508.js",
+    "main.js": "/vpn-functional-tests-dashboard/static/js/main.9f8169a6.js",
     "index.html": "/vpn-functional-tests-dashboard/index.html",
     "main.0d9a1fe8.css.map": "/vpn-functional-tests-dashboard/static/css/main.0d9a1fe8.css.map",
-    "main.03f7f508.js.map": "/vpn-functional-tests-dashboard/static/js/main.03f7f508.js.map"
+    "main.9f8169a6.js.map": "/vpn-functional-tests-dashboard/static/js/main.9f8169a6.js.map"
   },
   "entrypoints": [
     "static/css/main.0d9a1fe8.css",
-    "static/js/main.03f7f508.js"
+    "static/js/main.9f8169a6.js"
   ]
 }

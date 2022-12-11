@@ -6,6 +6,10 @@
   text-align: center;
 }
 
+a {
+  text-decoration: none;
+}
+
 .loader {
   position: absolute;
   left: 50%;
@@ -19,6 +23,108 @@
   border-top: 16px solid #17ca80;
   -webkit-animation: spin 2s linear infinite;
   animation: spin 2s linear infinite;
+}
+
+.workflow-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 5px 10px;
+}
+
+.history-sec {
+  padding: 15px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.card-title {
+  margin-left: 7px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.card-title-section {
+  display: flex;
+  align-items: center;
+}
+
+.conclusion {
+  margin: 0 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: gray;
+}
+
+.info-sec {
+  display: flex;
+  margin: 3px;
+  align-items: center;
+}
+
+.info-sec div {
+  padding: 2px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #b3b3b3;
+}
+
+.success-css {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #17ca80;
+  box-shadow: 0px 0px 9px 1px #17ca80;
+  margin: 15px;
+}
+
+.failure-css {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #f47169;
+  box-shadow: 0px 0px 9px 1px #f47169;
+  margin: 15px;
+}
+
+.progress-css {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ffbf00;
+  box-shadow: 0px 0px 9px 1px #ffbf00;
+  animation: glow 1.5s linear infinite alternate;
+  margin: 15px;
+}
+
+@keyframes glow{
+  to {
+    box-shadow: 0px 0px 30px 10px #ffbf00;
+  }
+}
+
+.allworkflow-info {
+  display: flex;  
+  align-items: flex-start;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: auto;
+  border: 1px solid;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.commit-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.divider {
+  border: 0;
+  height: 2px;
+  background-image: linear-gradient(to right, transparent, #D3D3D3, transparent);
 }
 
 @-webkit-keyframes spin {
@@ -63,6 +169,12 @@
   display: flex;
   justify-content: space-around;
   flex-direction: column;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.35);
+}
+
+.home {
+  width: 100%;
+  border-radius: 10px;
   box-shadow: 0 15px 50px rgba(0,0,0,0.35);
 }
 
@@ -144,7 +256,7 @@
 }
 
 .subTitle {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .sub {
@@ -163,7 +275,7 @@
 
 #workflows-container {
   max-width: 1200px;
-  margin: 1px auto;
+  margin: 20px auto;
   display: grid;
   gap: 4rem;
 }

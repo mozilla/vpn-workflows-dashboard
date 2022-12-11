@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
  
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes, HashRouter } from 'react-router-dom';
 import './App.css';
 import HomePage from './pages/HomePage';
 import FunctionalTestsPage from './pages/FunctionalTestsPage';
@@ -12,13 +12,13 @@ import WorkflowHistoryPage from './pages/WorkflowHistoryPage';
 const App = () => {
   return (
     <div className="App">
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path='/' element={<HomePage />} />
           <Route path='/workflows/:workflowId' element={<WorkflowHistoryPage />} />
           <Route path='/functional-tests' element={<FunctionalTestsPage />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </div>
   );
 }

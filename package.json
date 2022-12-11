@@ -1,4 +1,5 @@
 {
+  "homepage": "https://mozrokafor.github.io/vpn-workflows-dashboard",
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
@@ -9,6 +10,7 @@
     "react": "^18.2.0",
     "react-chartjs-2": "^5.0.1",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.7.1",
     "react-router-dom": "^6.4.3",
     "react-scripts": "5.0.1"
   },

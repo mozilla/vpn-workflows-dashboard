@@ -114,7 +114,7 @@ const WorkflowHistoryPage = () => {
                       </div>
                     </div>
                     <div className="commit">
-                      <div className="title">Commit</div>
+                      <div className="title">Commits</div>
                       <div className="subTitle">{run.head_commit.message}</div>
                       <div className="sub">
                         By {run.head_commit.author.name}

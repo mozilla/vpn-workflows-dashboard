@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/vpn-workflows-dashboard/static/css/main.0d9a1fe8.css",
-    "main.js": "/vpn-workflows-dashboard/static/js/main.9f8169a6.js",
+    "main.css": "/vpn-workflows-dashboard/static/css/main.737977f1.css",
+    "main.js": "/vpn-workflows-dashboard/static/js/main.bdb014c4.js",
     "index.html": "/vpn-workflows-dashboard/index.html",
-    "main.0d9a1fe8.css.map": "/vpn-workflows-dashboard/static/css/main.0d9a1fe8.css.map",
-    "main.9f8169a6.js.map": "/vpn-workflows-dashboard/static/js/main.9f8169a6.js.map"
+    "main.737977f1.css.map": "/vpn-workflows-dashboard/static/css/main.737977f1.css.map",
+    "main.bdb014c4.js.map": "/vpn-workflows-dashboard/static/js/main.bdb014c4.js.map"
   },
   "entrypoints": [
-    "static/css/main.0d9a1fe8.css",
-    "static/js/main.9f8169a6.js"
+    "static/css/main.737977f1.css",
+    "static/js/main.bdb014c4.js"
   ]
 }

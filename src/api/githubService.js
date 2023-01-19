@@ -5,31 +5,30 @@
 import axios from "axios";
 
 export const getAllWorkflows = async () => {
-  try {    
+  try {
     const api =
-    "https://raw.githubusercontent.com/mozrokafor/dashboard/main/data/allworkflows.json";
+      "https://raw.githubusercontent.com/mozrokafor/dashboard/main/data/allworkflows.json";
 
-  const {
-    data: { workflows },
-  } = await axios.get(api);
-  return workflows;
+    const {
+      data: { workflows },
+    } = await axios.get(api);
+    return workflows;
   } catch (err) {
     console.log(err);
-    return
+    return;
   }
-  
 };
 
 export const getAllRunsForWorkflow = async (workflow_id) => {
   try {
     const api = `https://raw.githubusercontent.com/mozrokafor/dashboard/main/data/workflowruns/workflowruns-${workflow_id}.json`;
-  
+
     const {
       data: { workflow_runs },
     } = await axios.get(api);
 
     return workflow_runs;
-  } catch(err){
+  } catch (err) {
     console.log(err);
     return;
   }
@@ -38,9 +37,7 @@ export const getAllRunsForWorkflow = async (workflow_id) => {
 export const getAllWorkflowsStats = async () => {
   const api = `https://raw.githubusercontent.com/mozrokafor/dashboard/main/data/allworkflowstats.json`;
 
-  const {
-    data,
-  } = await axios.get(api);
+  const { data } = await axios.get(api);
 
   return data[0];
 };
@@ -54,6 +51,36 @@ export const getFullTestWorkflowReport = async () => {
     } = await axios.get(api);
 
     return test_history;
+  } catch (err) {
+    console.log(err);
+    return;
+  }
+};
+
+export const getReleaseDiffsAsync = async () => {
+  const base = "releases/2.12.0";
+  const head = "releases/2.13.0";
+
+  try {
+    const api = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/compare/${base}...${head}`;
+
+    const { data } = await axios.get(api);
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    return;
+  }
+};
+
+export const getReleaseDiffs = () => {
+  const base = "releases/2.12.0";
+  const head = "releases/2.13.0";
+
+  try {
+    const api = `https://api.github.com/repos/mozilla-mobile/mozilla-vpn-client/compare/${base}...${head}`;
+
+    return axios.get(api).then(res => res.data);
   } catch (err) {
     console.log(err);
     return;

@@ -1,11 +1,12 @@
 {
-  "homepage": "https://mozrokafor.github.io/vpn-workflows-dashboard",
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@tanstack/react-query": "^4.22.0",
     "axios": "^1.1.3",
     "chart.js": "^4.0.1",
+    "chartjs-adapter-moment": "^1.0.1",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.0.1",

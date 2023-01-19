@@ -70,6 +70,7 @@ const WorkflowHistoryPage = () => {
         }
 
         setFailures(failures);
+        console.log(chartDataArray.reverse());
         setChartData(chartDataArray.reverse());
         setLoading(false);
       })

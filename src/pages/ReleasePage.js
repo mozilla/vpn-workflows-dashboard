@@ -8,15 +8,13 @@ import ReleaseCard from "../components/ReleaseCard";
 
 const ReleasePage = () => {
   const [diffs, setDiffs] = useState({})
-  const [justJira, setJustJira] = useState(true);
   const [commits, setCommits] = useState([]);
-  const [jiraCommits, setJiraCommits] = useState([]);
 
   useEffect(() => {
     getData();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [justJira]);
+  }, []);
 
   const getData = () => {
     let jc = [];
@@ -35,10 +33,7 @@ const ReleasePage = () => {
               jc.push(rc);
             }
           }
-
-          if (jc.length) {
-            setJiraCommits(jc);
-          }
+          
         }
       })
       .catch((err) => {        
@@ -46,48 +41,8 @@ const ReleasePage = () => {
       });    
   };
 
-  const toggleCommitsViewOn = () => {
-    setJustJira(true);
-    console.log(justJira);
-  };
-
-  const toggleCommitsViewOff = () => {
-    setJustJira(false);
-    console.log(justJira);
-  };
-
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <div
-          style={{
-            padding: ".7rem",
-            backgroundColor: justJira ? "black" : "white",
-            color: justJira ? "white" : "black",
-            border: "1px solid",
-            borderRadius: "10px",
-            margin: "0 10px",
-            cursor: "pointer",
-          }}
-          onClick={() => toggleCommitsViewOn()}
-        >
-          Jira Commits in Release
-        </div>
-        <div
-          style={{
-            padding: ".7rem",
-            backgroundColor: !justJira ? "black" : "white",
-            color: !justJira ? "white" : "black",
-            border: "1px solid",
-            borderRadius: "10px",
-            margin: "0 10px",
-            cursor: "pointer",
-          }}
-          onClick={() => toggleCommitsViewOff()}
-        >
-          All Commits in Release
-        </div>
-      </div>
       <div style={{ margin: "10px 0", fontWeight: "bold", fontSize: 30 }}>
         VPN releases/2.13.0 Dashboard
       </div>
@@ -110,24 +65,13 @@ const ReleasePage = () => {
           </div>
 
           <div id="workflows-container">
-            {justJira
-              ? jiraCommits.map((commit, idx) => {
+            {commits.map((commit, idx) => {
                   return (
                     <ReleaseCard
                       key={idx}
                       commitObject={commit}
-                      justJira={justJira}
                     />
-                  );
-                })
-              : commits.map((commit, idx) => {
-                  return (
-                    <ReleaseCard
-                      key={idx}
-                      commitObject={commit}
-                      justJira={justJira}
-                    />
-                  );
+                  )
                 })}
           </div>
         </>

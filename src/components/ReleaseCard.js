@@ -21,10 +21,13 @@ const ReleaseCard = ({ commitObject }) => {
       setJiraIssue(message.match(/VPN-(\d+(\.\d+)?)/g)[0])
             
       /*eslint-disable */
-      const titleArr = title.match(/\B\#\w\w+\b/g)
+      const tempTitle = message.split("*")[0]
+      const titleArr = tempTitle.match(/\B\#\w\w+\b/g)      
 
-      if(titleArr && titleArr.length){
-        setPullNumber(titleArr[0].replace('#', ""))
+      if(titleArr!== null){
+        const trimmedTitle = titleArr[0].replace('#', "")
+        console.log(trimmedTitle);
+        setPullNumber(trimmedTitle)
       }
     }
 

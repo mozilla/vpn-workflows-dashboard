@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,4 +14,33 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.workflow-run {
+  position: relative;
+}
+
+.workflow-run::before,
+.workflow-run::after {
+  --scale: 0;
+  position: absolute;
+  top: -.99rem;  
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%) scale(var(--scale));
+}
+
+.workflow-run::before {
+  content: attr(data-tooltip);
+  color: white;
+  padding: .5rem;
+  border-radius: .3rem;
+  text-align: center;
+  width: max-content;
+  max-width: 300px;
+  background: black;
+}
+
+.workflow-run:hover::before {
+  --scale: 1;
+  cursor: pointer;
 }

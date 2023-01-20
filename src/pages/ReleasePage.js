@@ -4,7 +4,8 @@
 
 import React, { useEffect, useState } from "react";
 import { getReleaseDiffsAsync } from "../api/githubService";
-import ReleaseCard from "../components/ReleaseCard";
+// import ReleaseCard from "../components/ReleaseCard";
+import ReleaseTable from "../components/ReleaseTable";
 
 const ReleasePage = () => {
   const [diffs, setDiffs] = useState({})
@@ -64,15 +65,8 @@ const ReleasePage = () => {
             <div>total commits: {diffs.total_commits}</div>
           </div>
 
-          <div id="workflows-container">
-            {commits.map((commit, idx) => {
-                  return (
-                    <ReleaseCard
-                      key={idx}
-                      commitObject={commit}
-                    />
-                  )
-                })}
+          <div>
+            <ReleaseTable commits={commits} />
           </div>
         </>
       )}

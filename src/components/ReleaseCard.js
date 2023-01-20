@@ -7,28 +7,27 @@ import React, { useEffect, useState } from "react";
 import { FaGithub, FaRegClock, FaJira } from "react-icons/fa";
 
 const ReleaseCard = ({ commitObject }) => {
-  const [commit, setCommit] = useState([]);  
-  const [jiraIssue, setJiraIssue] = useState("")
-  const [pullNumber, setPullNumber] = useState("")
-  const [title, setTitle] = useState("")
+  const [commit, setCommit] = useState([]);
+  const [jiraIssue, setJiraIssue] = useState("");
+  const [pullNumber, setPullNumber] = useState("");
+  const [title, setTitle] = useState("");
 
   useEffect(() => {
     setCommit(commitObject.commit);
 
-    const message = commitObject.commit.message
-    setTitle(message.split("*")[0])
-    if(message.includes('VPN-')){
-      setJiraIssue(message.match(/VPN-(\d+(\.\d+)?)/g)[0])
-            
-      /*eslint-disable */
-      const tempTitle = message.split("*")[0]
-      const titleArr = tempTitle.match(/\B\#\w\w+\b/g)      
+    const message = commitObject.commit.message;
+    setTitle(message.split("*")[0]);
+    if (message.includes("VPN-")) {
+      setJiraIssue(message.match(/VPN-(\d+(\.\d+)?)/g)[0]);
+    }
 
-      if(titleArr!== null){
-        const trimmedTitle = titleArr[0].replace('#', "")
-        console.log(trimmedTitle);
-        setPullNumber(trimmedTitle)
-      }
+    /*eslint-disable */
+    const tempTitle = message.split("*")[0];
+    const titleArr = tempTitle.match(/\B\#\w\w+\b/g);
+
+    if (titleArr !== null) {
+      const trimmedTitle = titleArr[0].replace("#", "");
+      if (trimmedTitle) setPullNumber(trimmedTitle);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,13 +39,24 @@ const ReleaseCard = ({ commitObject }) => {
       style={{
         boxShadow: "0 15px 50px rgba(0,0,0,0.35)",
         borderRadius: 10,
-        padding: "1rem",          
+        padding: "1rem",
       }}
     >
       {commit.author && (
         <>
-          <div style={{textDecoration: 'none', color: '#000', width: 308, height: 60}}>
-            <a href={`https://github.com/mozilla-mobile/mozilla-vpn-client/pull/${pullNumber}`} target="_blank" rel="noreferrer noopener">
+          <div
+            style={{
+              textDecoration: "none",
+              color: "#000",
+              width: 308,
+              height: 60,
+            }}
+          >
+            <a
+              href={`https://github.com/mozilla-mobile/mozilla-vpn-client/pull/${pullNumber}`}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
               {title}
             </a>
           </div>
@@ -68,9 +78,7 @@ const ReleaseCard = ({ commitObject }) => {
               <div>
                 <FaGithub />
               </div>
-              <div>
-                  {commit.author.name}
-              </div>
+              <div>{commit.author.name}</div>
             </div>
             <div className="info-sec">
               <div>
@@ -83,12 +91,16 @@ const ReleaseCard = ({ commitObject }) => {
                 <FaJira />
               </div>
               <div>
-              <a
-                  href={jiraIssue ? `https://mozilla-hub.atlassian.net/browse/${jiraIssue}` : null}
+                <a
+                  href={
+                    jiraIssue
+                      ? `https://mozilla-hub.atlassian.net/browse/${jiraIssue}`
+                      : null
+                  }
                   target="_blank"
                   rel="noreferrer noopener"
-                >                  
-                {jiraIssue ? jiraIssue : 'No Jira Ticket'}
+                >
+                  {jiraIssue ? jiraIssue : "No Jira Ticket"}
                 </a>
               </div>
             </div>

@@ -33,6 +33,52 @@ a {
   padding: 5px 10px;
 }
 
+.bold {
+  font-weight: bold;
+}
+
+/* table { 
+  border-spacing:10px 20px;
+} */
+
+.commit-header {
+  box-shadow: 0px 2px 0px 0px rgba(0,0,0,0.99);
+}
+
+.commit-header th {
+  padding: 30px 0px;
+}
+
+.commits {
+  box-shadow: 0px 1px 0px 0px #c0c0c0;
+}
+
+.commits td {
+  padding: 30px 0px;
+}
+
+tr {
+  border-style: solid
+}
+
+th {
+  min-width: 170px;
+}
+
+/* .border_bottom {
+  -webkit-box-shadow: 0px 2px 0px 0px rgba(0,0,0,0.99);
+  -moz-box-shadow: 0px 2px 0px 0px rgba(0,0,0,0.99);
+  box-shadow: 0px 2px 0px 0px rgba(0,0,0,0.99);
+} */
+
+.commits tr {
+  height: 50px;
+}
+
+.row td {
+  border-style: 20px;
+}
+
 .history-sec {
   padding: 15px;
   display: flex;
